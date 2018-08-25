@@ -1,14 +1,15 @@
 #include "point_cloud_targeting.h"
+#include <ros/ros.h>
 
 namespace mkp_pcd_targeting
 {
 
-void pcd_targeing::pointcloudsubscriberCallback(const sensor_msgs::PointCloud2ConstPtr cloud)
+void pcd_targeting::pointcloudsubscriberCallback(const sensor_msgs::PointCloud2ConstPtr &cloud)
 {
    pcl::fromROSMsg(*cloud, pointcloud_in_XYZ);
 }
 
-bool pointcloudtargetingService(mkp_pcd::targeting::Request& req, mkp_pcd::targeting::Response& res)
+bool pcd_targeting::pointcloudtargetingService(mkp_pcd::targeting::Request& req, mkp_pcd::targeting::Response& res)
 {
   point_buffer_usedInAtMethod = pointcloud_in_XYZ.at(req.img_x , req.img_y);
   res.pcd_x = point_buffer_usedInAtMethod.x;
@@ -19,15 +20,17 @@ bool pointcloudtargetingService(mkp_pcd::targeting::Request& req, mkp_pcd::targe
 
 
 
-pcd_targeing::pcd_targeing():queue_size_(1000)
+pcd_targeting::pcd_targeting(): queue_size_(1000)
 {
-  point_cloud_subscribe_t point_cloud_subscriber_callback =
-        boost::bind(&pcd_targeing::pointcloudsubscriberCallback, this, _1);
-  point_cloud_subscribe = n_.subscribe("....", queue_size_, point_cloud_subscriber_callback);
 
   targeting_server_t point_cloud_targeting_service =
-        boost::bind(&pcd_targeing::pointcloudtargetingService, this, _1, _2);
-  targeting_server = n_.advertiseService("mkp_pcd/pcd_targeting", point_cloud_targeting_service);
+        boost::bind(&pcd_targeting::pointcloudtargetingService, this, _1, _2);
+  pcd_targeing_server = n_.advertiseService("mkp_pcd/pcd_targeting", point_cloud_targeting_service);
+
+  point_cloud_subscribe_t point_cloud_subscriber_callback_m =
+        boost::bind(&pcd_targeting::pointcloudsubscriberCallback, this, _1);
+  pointcloud_subscriber_m = n_.subscribe("TBD", queue_size_, point_cloud_subscriber_callback_m);
+
 
 }
 
