@@ -5,10 +5,10 @@
 using namespace std;
 int main(int argc,char**argv){
   ros::init(argc, argv, "point_cloud_registration");
-  mkp_pcd_registration::pcd_registration REG;
-  REG.LoadFiles();
-  REG.PCDprocessRegistration();
-  REG.spin();
+  mkp_pcd_registration::pcd_registration().spin();
+  //REG.LoadFiles();
+  //REG.PCDprocessRegistration();
+  //REG.spin();
   return 0 ;
 }
 

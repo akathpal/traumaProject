@@ -17,6 +17,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   roslib
   message_generation
+  libpointmatcher_ros
+  libpointmatcher
 )
 
 find_package(libpointmatcher CONFIG)
@@ -67,6 +69,10 @@ find_package(libpointmatcher CONFIG)
    srv
    FILES
    targeting.srv
+   registration_clear.srv
+   registration_merge_and_output.srv
+   registration_process_registration.srv
+   registration_take_view.srv
  )
 
 
@@ -129,6 +135,7 @@ catkin_package(
     sensor_msgs
     std_msgs
     libpointmatcher
+    libpointmatcher_ros
 )
 
 ###########

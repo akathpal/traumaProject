@@ -13,6 +13,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/transforms.h>
 #include <mkp_pcd/targeting.h>
+#include <algorithm> // pt.indices.assign
 
 
 

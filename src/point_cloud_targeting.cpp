@@ -29,7 +29,7 @@ pcd_targeting::pcd_targeting(): queue_size_(1000)
 
   point_cloud_subscribe_t point_cloud_subscriber_callback_m =
         boost::bind(&pcd_targeting::pointcloudsubscriberCallback, this, _1);
-  pointcloud_subscriber_m = n_.subscribe("TBD", queue_size_, point_cloud_subscriber_callback_m);
+  pointcloud_subscriber_m = n_.subscribe("mkp_pcd/pointCloudToRobotFrame", queue_size_, point_cloud_subscriber_callback_m);
 
 
 }
