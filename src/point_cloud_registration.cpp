@@ -32,7 +32,7 @@ namespace mkp_pcd_registration
             boost::bind(&pcd_registration::pointcloudsubscriberCallback, this, _1);
       pointcloud_subscriber_m = n_.subscribe("mkp_pcd/pointCloudToRobotFrame", queue_size_,
                                                                     point_cloud_subscriber_callback_m);
-
+      pub_merge_point_=n_.advertise<sensor_msgs::PointCloud2> ("mkp_pcd/registration_result", 1000);
   }
 
   void pcd_registration::PCDprocessRegistration()
@@ -110,6 +110,13 @@ bool pcd_registration::MergePoint(mkp_pcd::registration_merge_and_output::Reques
   {
     data_out_merge.concatenate(Dps_saved_from_process_registration[i]);
   }
+
+  //TODO transforms the point cloud to the ros message
+  sensor_msgs::PointCloud2 buffer__ =
+         PointMatcher_ros::pointMatcherCloudToRosMsg< float >	(data_out_merge, "world", ros::Time::now());
+  //TODO publish and spineonce.
+  pub_merge_point_.publish(buffer__);
+  ros::spinOnce();
   data_out_merge.save("pointCloudFile_out_merge.pcd");
   ROS_INFO("MergePoint function Done");
   return true;

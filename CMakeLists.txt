@@ -73,6 +73,7 @@ find_package(libpointmatcher CONFIG)
    registration_merge_and_output.srv
    registration_process_registration.srv
    registration_take_view.srv
+   trigger.srv
  )
 
 
@@ -174,6 +175,14 @@ include/point_cloud_registration.h
 )
 add_dependencies(${PROJECT_NAME}_registration_node ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME}_registration_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${libpointmatcher_LIBRARIES})
+
+#------------------color saving---------------------------
+
+add_executable(${PROJECT_NAME}_saveColor_node 
+src/color_point_cloud_save_main.cpp
+)
+add_dependencies(${PROJECT_NAME}_saveColor_node ${PROJECT_NAME}_gencpp)
+target_link_libraries(${PROJECT_NAME}_saveColor_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 #############
 ## Install ##

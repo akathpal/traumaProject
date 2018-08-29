@@ -32,6 +32,7 @@ private:
   ros::ServiceServer pcd_registration_merge_and_output;
   ros::ServiceServer pcd_registration_clear_all;
   ros::Subscriber pointcloud_subscriber_m;
+  ros::Publisher pub_merge_point_;
   unsigned int queue_size_;
   PM::TransformationParameters global;
   PM::ICP icp;
