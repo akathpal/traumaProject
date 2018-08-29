@@ -33,7 +33,7 @@ private:
   ros::ServiceServer pcd_registration_clear_all;
   ros::Subscriber pointcloud_subscriber_m;
   unsigned int queue_size_;
-  PM::TransformationParameters global = Eigen::Matrix4f::Identity();
+  PM::TransformationParameters global;
   PM::ICP icp;
   DP buffer_cloud;
 

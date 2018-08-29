@@ -1,6 +1,6 @@
 
-uint32 img_x
-uint32 img_y
+int32 img_x
+int32 img_y
 ---------
 float64 pcd_x
 float64 pcd_y

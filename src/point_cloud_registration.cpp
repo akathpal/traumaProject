@@ -37,6 +37,7 @@ namespace mkp_pcd_registration
 
   void pcd_registration::PCDprocessRegistration()
   {
+    global = Eigen::Matrix4f::Identity();
     std::cout << "index_to_be_selected_to_registration.size()= " << index_to_be_selected_to_registration.size() << std::endl;
     Dps_saved_from_process_registration.push_back(Dps_saved_from_input[0]);
 
