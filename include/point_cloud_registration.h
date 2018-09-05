@@ -39,20 +39,25 @@ private:
   DP buffer_cloud;
 
 
+
   bool takeView(mkp_pcd::registration_take_view::Request& req, mkp_pcd::registration_take_view::Response& res);
   std::vector<DP> Dps_saved_from_input; // take_view
 
   bool LoadRequest(mkp_pcd::registration_process_registration::Request& req, mkp_pcd::registration_process_registration::Response& res);
   std::vector<int> index_to_be_selected_to_registration;
 
-  void PCDprocessRegistration(); // inside of the LoadRequest once it sort the order index
+  void PCDprocessRegistration(int type); // inside of the LoadRequest once it sort the order index
   std::vector<DP> Dps_saved_from_process_registration;
+  int reg_index;
+
 
   bool MergePoint(mkp_pcd::registration_merge_and_output::Request& req, mkp_pcd::registration_merge_and_output::Response& res);
+  std::vector<DP> pcd_reg_merged_storing;
 
   bool Clear(mkp_pcd::registration_clear::Request& req, mkp_pcd::registration_clear::Response& res);
 
   void pointcloudsubscriberCallback(const sensor_msgs::PointCloud2ConstPtr &cloud);
+
 
 public:
      pcd_registration();

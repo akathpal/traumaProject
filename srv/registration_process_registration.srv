@@ -1,3 +1,4 @@
 int32[] indices
+int32 type
 ------------------
 std_msgs/Bool ifdone

@@ -33,44 +33,75 @@ namespace mkp_pcd_registration
       pointcloud_subscriber_m = n_.subscribe("mkp_pcd/pointCloudToRobotFrame", queue_size_,
                                                                     point_cloud_subscriber_callback_m);
       pub_merge_point_=n_.advertise<sensor_msgs::PointCloud2> ("mkp_pcd/registration_result", 1000);
+      reg_index = 0;
   }
 
-  void pcd_registration::PCDprocessRegistration()
+//TODO 20180903 Michael: This can make a template for using different source, such as Dps_saved_from_input
+  void pcd_registration::PCDprocessRegistration(int type)
   {
     global = Eigen::Matrix4f::Identity();
     std::cout << "index_to_be_selected_to_registration.size()= " << index_to_be_selected_to_registration.size() << std::endl;
-    Dps_saved_from_process_registration.push_back(Dps_saved_from_input[0]);
 
-    for(int i = 1;i<index_to_be_selected_to_registration.size();i++)
+    switch(type)
     {
-      int be_tras_index = index_to_be_selected_to_registration[i];
-      int ref_index = index_to_be_selected_to_registration[i-1];
-    std::cout << "i= " << i << std::endl;
-    // Compute the transformation that expresses data in ref
-   // frame started from 1, so grabbing the point cloud need to be index_to_be_selected_to_registration[]-1;
-  	PM::TransformationParameters T = icp(Dps_saved_from_input[be_tras_index-1], Dps_saved_from_input[ref_index-1]);
-  	// Transform data to express it in ref
-  	DP data_out(Dps_saved_from_input[be_tras_index-1]);
-    global= global*T;
-  	icp.transformations.apply(data_out, global);
-  	data_out.save("pointCloudFile_out" + std::to_string(i) + ".pcd");
-    Dps_saved_from_process_registration.push_back(data_out);
-    }
+      case 1:
+      {
+        Dps_saved_from_process_registration.push_back(Dps_saved_from_input[index_to_be_selected_to_registration[0]-1]);
+        for(int i = 1;i<index_to_be_selected_to_registration.size();i++)
+        {
+          int be_tras_index = index_to_be_selected_to_registration[i];
+          int ref_index = index_to_be_selected_to_registration[i-1];
+        std::cout << "i= " << i << std::endl;
+        // Compute the transformation that expresses data in ref
+       // frame started from 1, so grabbing the point cloud need to be index_to_be_selected_to_registration[]-1;
+        PM::TransformationParameters T = icp(Dps_saved_from_input[be_tras_index-1], Dps_saved_from_input[ref_index-1]);
+        // Transform data to express it in ref
+        DP data_out(Dps_saved_from_input[be_tras_index-1]);
+        global= global*T;
+        icp.transformations.apply(data_out, global);
+        data_out.save("pointCloudFile_out" + std::to_string(reg_index) + ".pcd");
+        reg_index=reg_index+1;
+        Dps_saved_from_process_registration.push_back(data_out);
+        }
+        break;
+      } // case 1
+      case 2:
+      {
+        Dps_saved_from_process_registration.push_back(pcd_reg_merged_storing[index_to_be_selected_to_registration[0]-1]); // you need a base
+        for(int i = 1;i<index_to_be_selected_to_registration.size();i++)
+        {
+          int be_tras_index = index_to_be_selected_to_registration[i];
+          int ref_index = index_to_be_selected_to_registration[i-1];
+        std::cout << "i= " << i << std::endl;
+        PM::TransformationParameters T = icp(pcd_reg_merged_storing[be_tras_index-1], pcd_reg_merged_storing[ref_index-1]);
+        // Transform data to express it in ref
+        DP data_out(pcd_reg_merged_storing[be_tras_index-1]);
+        global= global*T;
+        icp.transformations.apply(data_out, global);
+        data_out.save("pointCloudFile_out" + std::to_string(i) + ".pcd");
+        Dps_saved_from_process_registration.push_back(data_out);
+        }
+        // merge and output
+        ROS_INFO("Entering MergePoint function");
+        DP data_out_merge(Dps_saved_from_process_registration[0]);
+        for(int i=1;i < Dps_saved_from_process_registration.size();i++)
+        {
+          data_out_merge.concatenate(Dps_saved_from_process_registration[i]);
+        }
+        //transforms the point cloud to the ros message
+        sensor_msgs::PointCloud2 buffer__ =
+               PointMatcher_ros::pointMatcherCloudToRosMsg< float >	(data_out_merge, "world", ros::Time::now());
+        //publish and spineonce.
+        pub_merge_point_.publish(buffer__);
+        ros::spinOnce();
+        ROS_INFO("MergePoint function Done");
+
+        break;
+      }
+
+    }// end switch
 
   }
-  /*
-  void pcd_registration::LoadFiles()
-  {
-    const DP ref(DP::load("pointCloudFile_1.pcd"));
-    Dps.push_back(ref);
-  	DP data(DP::load("pointCloudFile_2.pcd"));
-    Dps.push_back(data);
-  	DP data1(DP::load("pointCloudFile_3.pcd"));
-    Dps.push_back(data1);
-    DP data2(DP::load("pointCloudFile_4.pcd"));
-    Dps.push_back(data2);
-  }
-  */
 
   void pcd_registration::spin()
   {
@@ -84,14 +115,23 @@ namespace mkp_pcd_registration
 
 bool pcd_registration::LoadRequest(mkp_pcd::registration_process_registration::Request& req, mkp_pcd::registration_process_registration::Response& res)
 {
+  // http://www.cplusplus.com/reference/vector/vector/assign/
+  // Assigns new contents to the vector, replacing its current contents, and modifying its size accordingly.
   index_to_be_selected_to_registration.assign(req.indices.begin(),req.indices.end());
-  /*
-  for(int i= 0;i < req.indices.size();i++)
+  switch(req.type)
   {
-  index_to_be_selected_to_registration.push_back(req.indices[i]); //
+    case 1:
+    {
+    PCDprocessRegistration(req.type);
+    break;
+    }
+    case 2:
+    {
+    PCDprocessRegistration(req.type);
+    break;
+    }
   }
-  */
-  PCDprocessRegistration();
+
  return true;
 }
 
@@ -110,22 +150,27 @@ bool pcd_registration::MergePoint(mkp_pcd::registration_merge_and_output::Reques
   {
     data_out_merge.concatenate(Dps_saved_from_process_registration[i]);
   }
+  pcd_reg_merged_storing.push_back(data_out_merge);// 20180903 Michael store the result
 
-  //TODO transforms the point cloud to the ros message
+  //transforms the point cloud to the ros message
   sensor_msgs::PointCloud2 buffer__ =
          PointMatcher_ros::pointMatcherCloudToRosMsg< float >	(data_out_merge, "world", ros::Time::now());
-  //TODO publish and spineonce.
+  //publish and spineonce.
   pub_merge_point_.publish(buffer__);
   ros::spinOnce();
   data_out_merge.save("pointCloudFile_out_merge.pcd");
   ROS_INFO("MergePoint function Done");
+  Dps_saved_from_process_registration.clear();// 20180904 Michael
+
   return true;
 }
+
 bool pcd_registration::Clear(mkp_pcd::registration_clear::Request& req, mkp_pcd::registration_clear::Response& res)
 {
   Dps_saved_from_input.clear();
-  index_to_be_selected_to_registration.clear();
   Dps_saved_from_process_registration.clear();
+  pcd_reg_merged_storing.clear();
+  reg_index = 0;
   return true;
 
 }
