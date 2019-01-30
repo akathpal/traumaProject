@@ -13,16 +13,19 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   pcl_conversions
+  geometry_msgs
   pcl_ros
   tf
   roslib
   message_generation
+  trajectory_msgs
   libpointmatcher_ros
   libpointmatcher
 )
 
 find_package(libpointmatcher CONFIG)
-
+find_package( orocos_kdl REQUIRED )
+find_package( Eigen3 REQUIRED )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -74,6 +77,8 @@ find_package(libpointmatcher CONFIG)
    registration_process_registration.srv
    registration_take_view.srv
    trigger.srv
+   movj.srv
+   FindWidthOrHeight.srv
  )
 
 
@@ -94,6 +99,8 @@ find_package(libpointmatcher CONFIG)
    DEPENDENCIES
    std_msgs
    sensor_msgs
+   trajectory_msgs
+   geometry_msgs
  )
 
 ################################################
@@ -137,6 +144,8 @@ catkin_package(
     std_msgs
     libpointmatcher
     libpointmatcher_ros
+    trajectory_msgs
+    geometry_msgs
 )
 
 ###########
@@ -149,6 +158,7 @@ include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
   ${libpointmatcher_INCLUDE_DIRS}
   include/
 )
@@ -183,6 +193,41 @@ src/color_point_cloud_save_main.cpp
 )
 add_dependencies(${PROJECT_NAME}_saveColor_node ${PROJECT_NAME}_gencpp)
 target_link_libraries(${PROJECT_NAME}_saveColor_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+#------------------ultrasound_main------------------------
+
+add_executable(${PROJECT_NAME}_ultrasound_main  
+src/ultrasound_main.cpp
+)
+add_dependencies(${PROJECT_NAME}_ultrasound_main ${PROJECT_NAME}_gencpp)
+target_link_libraries(${PROJECT_NAME}_ultrasound_main ${catkin_LIBRARIES})
+
+#------------------ros_iiwa_publisher--------------------
+
+add_executable(${PROJECT_NAME}_node_fkpublisher src/fkpublisher.cpp)
+target_link_libraries(${PROJECT_NAME}_node_fkpublisher ${catkin_LIBRARIES} ${PCL_LIBRARIES} orocos-kdl)
+
+
+#********************* MOT_movJServerCallback   *******************
+
+add_executable(${PROJECT_NAME}_node_movJServerCallback 
+  src/MOT_movjcallback.cpp )
+
+target_link_libraries(${PROJECT_NAME}_node_movJServerCallback  
+  ${catkin_LIBRARIES} 
+)
+
+add_dependencies(${PROJECT_NAME}_node_movJServerCallback ${PROJECT_NAME}_gencpp)
+
+#------------------------SegmentPhantomWidth-------------------------
+
+add_executable(${PROJECT_NAME}_SegmentPhantomWidth_node 
+src/SegmentPhantomWidth.cpp
+)
+add_dependencies(${PROJECT_NAME}_SegmentPhantomWidth_node ${PROJECT_NAME}_gencpp)
+target_link_libraries(${PROJECT_NAME}_SegmentPhantomWidth_node ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+
+
 
 #############
 ## Install ##

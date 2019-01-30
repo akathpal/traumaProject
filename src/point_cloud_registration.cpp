@@ -59,7 +59,7 @@ namespace mkp_pcd_registration
         DP data_out(Dps_saved_from_input[be_tras_index-1]);
         global= global*T;
         icp.transformations.apply(data_out, global);
-        data_out.save("pointCloudFile_out" + std::to_string(reg_index) + ".pcd");
+        data_out.save(ros::package::getPath("mkp_pcd") + "/pointCloudFile_out" + std::to_string(reg_index) + ".pcd");
         reg_index=reg_index+1;
         Dps_saved_from_process_registration.push_back(data_out);
         }
@@ -68,6 +68,7 @@ namespace mkp_pcd_registration
       case 2:
       {
         Dps_saved_from_process_registration.push_back(pcd_reg_merged_storing[index_to_be_selected_to_registration[0]-1]); // you need a base
+        std::cout << "pcd_reg_merged_storing.size()= " << pcd_reg_merged_storing.size() << std::endl;
         for(int i = 1;i<index_to_be_selected_to_registration.size();i++)
         {
           int be_tras_index = index_to_be_selected_to_registration[i];
@@ -78,16 +79,22 @@ namespace mkp_pcd_registration
         DP data_out(pcd_reg_merged_storing[be_tras_index-1]);
         global= global*T;
         icp.transformations.apply(data_out, global);
-        data_out.save("pointCloudFile_out" + std::to_string(i) + ".pcd");
+
+        data_out.save(ros::package::getPath("mkp_pcd") + "/pointCloudFile_out" + std::to_string(i) + ".pcd");
         Dps_saved_from_process_registration.push_back(data_out);
         }
+
         // merge and output
         ROS_INFO("Entering MergePoint function");
         DP data_out_merge(Dps_saved_from_process_registration[0]);
+        ROS_INFO("Pass");
+        std::cout << "Dps_saved_from_process_registration.size()= " << Dps_saved_from_process_registration.size() << std::endl;
         for(int i=1;i < Dps_saved_from_process_registration.size();i++)
         {
+          ROS_INFO("Pass");
           data_out_merge.concatenate(Dps_saved_from_process_registration[i]);
         }
+        ROS_INFO("Pass_merge_loop");
         //transforms the point cloud to the ros message
         sensor_msgs::PointCloud2 buffer__ =
                PointMatcher_ros::pointMatcherCloudToRosMsg< float >	(data_out_merge, "world", ros::Time::now());
@@ -158,7 +165,7 @@ bool pcd_registration::MergePoint(mkp_pcd::registration_merge_and_output::Reques
   //publish and spineonce.
   pub_merge_point_.publish(buffer__);
   ros::spinOnce();
-  data_out_merge.save("pointCloudFile_out_merge.pcd");
+  data_out_merge.save(ros::package::getPath("mkp_pcd") + "/pointCloudFile_out_merge.pcd");
   ROS_INFO("MergePoint function Done");
   Dps_saved_from_process_registration.clear();// 20180904 Michael
 

@@ -8,6 +8,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <boost/make_shared.hpp>
 #include <pcl/point_types.h>
+#include <ros/package.h>
 #include <pcl/point_cloud.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_conversions/pcl_conversions.h>

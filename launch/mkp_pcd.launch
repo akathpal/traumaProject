@@ -1,0 +1,28 @@
+<launch>
+	<node name="pcd_movJServerCallback" pkg="mkp_pcd" type="mkp_pcd_node_movJServerCallback">
+	</node>
+
+	<node name="pcd_SegmentPhantomWidth_node" pkg="mkp_pcd" type="mkp_pcd_SegmentPhantomWidth_node">
+	</node>
+	
+        <node name="pcd_node_fkpublisher" pkg = "mkp_pcd" type="mkp_pcd_node_fkpublisher">
+	</node>
+
+        <node name="pcd_saveColor_node" pkg = "mkp_pcd" type="mkp_pcd_saveColor_node">
+	</node>
+
+        <node name="pcd_registration_node" pkg = "mkp_pcd" type="mkp_pcd_registration_node">
+	</node> 
+
+        <node name="pcd_ultrasound_main" pkg = "mkp_pcd" type="mkp_pcd_ultrasound_main">
+	</node> 
+
+        <node name="pcd_targeting_node" pkg = "mkp_pcd" 
+type="mkp_pcd_targeting_node">
+	</node> 
+
+        <!--node name="pcd_targeting_node" pkg = "mkp_pcd" 
+type="mkp_pcd_targeting_node">
+	</node--> 
+
+</launch>
