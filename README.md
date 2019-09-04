@@ -10,7 +10,7 @@
 ```
 roslaunch mkp_pcd mkp_pcd.launch 
 ```
-3. Eun the main file: 
+3. Run the main file: 
 ```
 rosrun mkp_pcd mkp_pcd_ultrasound_main
 ```
