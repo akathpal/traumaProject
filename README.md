@@ -5,11 +5,12 @@
 
 
 # How to run 
-1. Make sure you have the dependencies installed 
+1. Make sure you have the dependencies installed.
+2. launch the nodes for point cloud processing:
 ```
 roslaunch mkp_pcd mkp_pcd.launch 
 ```
-will launch the point cloud nodes. 
+3. run the main file: 
 ```
 rosrun mkp_pcd mkp_pcd_ultrasound_main
 ```
